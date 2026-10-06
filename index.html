@@ -173,6 +173,26 @@ input,select{font-family:inherit;font-size:16px;color:inherit;}
 .assess-btn.mid{border-color:color-mix(in srgb,var(--warn) 45%,var(--line));}
 .assess-btn.no{border-color:color-mix(in srgb,var(--bad) 45%,var(--line));}
 
+/* ---- 选择题选项 ---- */
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{
+  display:flex;gap:10px;align-items:flex-start;text-align:left;
+  width:100%;padding:13px 14px;
+  border:1px solid var(--line);border-radius:var(--radius-sm);
+  background:var(--card);line-height:1.5;font-size:15px;
+  transition:border-color .12s,background .12s;
+}
+.opt .idx{
+  flex:0 0 auto;width:22px;height:22px;border-radius:50%;
+  background:var(--card-2);border:1px solid var(--line);
+  font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;
+  margin-top:1px;
+}
+.opt.correct{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent);}
+.opt.correct .idx{background:var(--ok);border-color:var(--ok);color:#fff;}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent);}
+.opt.wrong .idx{background:var(--bad);border-color:var(--bad);color:#fff;}
+
 /* ---- 参考代码 ---- */
 .code-head{font-size:13px;font-weight:600;margin:16px 0 6px;color:var(--brand-text);}
 .code-block{
@@ -327,12 +347,19 @@ input,select{font-family:inherit;font-size:16px;color:inherit;}
   </div>
 
   <button class="btn" onclick="go('practice')">开始做题</button>
+  <button class="btn ghost" onclick="go('choice')">做基础选择题</button>
 </section>
 
 <!-- ============ 刷题 ============ -->
 <section class="page" id="page-practice">
   <div class="chips" id="catChips"></div>
   <div id="practiceBody"></div>
+</section>
+
+<!-- ============ 基础选择题 ============ -->
+<section class="page" id="page-choice">
+  <div class="chips" id="choiceChips"></div>
+  <div id="choiceBody"></div>
 </section>
 
 <!-- ============ 错题本 ============ -->
@@ -353,6 +380,10 @@ input,select{font-family:inherit;font-size:16px;color:inherit;}
   <div class="card">
     <h2 class="card-title">各考点掌握度 <span class="hint">按掌握率</span></h2>
     <div id="catProgress"></div>
+  </div>
+  <div class="card">
+    <h2 class="card-title">选择题掌握度 <span class="hint">按掌握率</span></h2>
+    <div id="choiceProgress"></div>
   </div>
   <div class="card">
     <h2 class="card-title">累计数据</h2>
@@ -402,6 +433,7 @@ input,select{font-family:inherit;font-size:16px;color:inherit;}
       然后诚实地自评三档——<b>会做</b> / <b>有思路但没做出来</b> / <b>完全不会</b>；<br>
       再点开「思路 + 参考代码（C++）」对照，看看差在哪里。<br>
       <b>记什么：</b>「会做」计入掌握率；「完全不会」自动进错题本，方便二刷。<br>
+      <b>基础选择题：</b>底部「选择」页里是 C++ 语法、计算机基础、CSP 常识的单选题，点选项后会立刻自动判分并给解析；答错的题同样进错题本。<br>
       <b>提示：</b>手机没法编译运行代码，真正交题请在电脑上用 CCF 官方系统。
     </div>
   </div>
@@ -420,7 +452,8 @@ input,select{font-family:inherit;font-size:16px;color:inherit;}
 
 <nav class="navbar">
   <button data-view="home" class="active"><span class="n-ico">🏠</span>总览</button>
-  <button data-view="practice"><span class="n-ico">✍️</span>刷题</button>
+  <button data-view="practice"><span class="n-ico">✍️</span>真题</button>
+  <button data-view="choice"><span class="n-ico">✅</span>选择</button>
   <button data-view="wrong"><span class="n-ico">📕</span>错题</button>
   <button data-view="stats"><span class="n-ico">📊</span>统计</button>
   <button data-view="me"><span class="n-ico">⚙️</span>我的</button>
@@ -723,10 +756,336 @@ int main(){
     }
     printf("%d\n", ans);
     return 0;
+}`},
+
+  {id:12,cat:"基础语法",source:"CCF CSP 201512-1",title:"数位之和",limit:"1.0s / 256MB",
+   desc:"给定一个十进制整数 n，输出 n 的各位数字之和。\n例如 20151220 的各位数字之和为 2 + 0 + 1 + 5 + 1 + 2 + 2 + 0 = 13。",
+   input:"输入一个整数 n（0 ≤ n ≤ 1000000000）。",
+   output:"输出一个整数，表示答案。",
+   samples:[{in:"20151220",out:"13"}],
+   hint:"把一个数的每一位拆出来：n % 10 拿到末位，n / 10 去掉末位，循环直到 n 变成 0，把每次拿到的末位累加即可。\n注意 n 可能是 0，此时循环一次都不执行，直接输出 0，正好正确。",
+   code:String.raw`#include <cstdio>
+int main(){
+    int n, sum = 0;
+    scanf("%d", &n);
+    while(n > 0){
+        sum += n % 10;   // 取出末位
+        n /= 10;         // 去掉末位
+    }
+    printf("%d\n", sum);
+    return 0;
+}`},
+
+  {id:13,cat:"模拟",source:"CCF CSP 201509-1",title:"数列分段",limit:"1.0s / 256MB",
+   desc:"给定一个整数数列，数列中连续相同的最长整数序列算成一段，问数列中共有多少段？\n例如数列 8 8 8 0 12 12 8 0 中：8 8 8 是第一段，0 是第二段，12 12 是第三段，接着的 8 是第四段，最后的 0 是第五段，共 5 段。",
+   input:"第一行包含一个整数 n（1 ≤ n ≤ 1000），表示数列中整数的个数。\n第二行包含 n 个整数 a1, a2, ..., an（0 ≤ ai ≤ 1000），相邻整数之间用一个空格分隔。",
+   output:"输出一个整数，表示给定的数列有多少段。",
+   samples:[{in:"8\n8 8 8 0 12 12 8 0",out:"5"}],
+   hint:"从第二项开始依次和前一项比较：只要不相同，就说明进入了一个新段，段数 +1。\n第一项本身固定算一段，所以段数从 1 开始计数。",
+   code:String.raw`#include <cstdio>
+int main(){
+    int n, a[1005];
+    scanf("%d", &n);
+    for(int i = 0; i < n; ++i) scanf("%d", &a[i]);
+    int cnt = 1;
+    for(int i = 1; i < n; ++i)
+        if(a[i] != a[i-1]) cnt++;
+    printf("%d\n", cnt);
+    return 0;
+}`},
+
+  {id:14,cat:"模拟",source:"CCF CSP 201604-1",title:"折点计数",limit:"1.0s / 256MB",
+   desc:"给定 n 个整数 a1, a2, ..., an 表示一个商店连续 n 天的销售量。如果某天之前销售量在增长、而后一天销售量减少，则称这一天为折点；反过来，如果之前销售量在减少、而后一天销售量在增长，也称这一天为折点。其他的天都不是折点。\n请计算这些天总共有多少个折点。\n数据保证相邻两天的销售量总是不同的（即 a(i-1) ≠ a(i)），但不相邻的两天可能相同。",
+   input:"第一行包含一个整数 n（1 ≤ n ≤ 1000）。\n第二行包含 n 个整数，用空格分隔，分别表示 a1, a2, ..., an（每天的销售量是不超过 10000 的非负整数）。",
+   output:"输出一个整数，表示折点出现的数量。",
+   samples:[{in:"7\n5 4 1 2 3 6 4",out:"2"}],
+   hint:"折点就是「局部最高」或「局部最低」。\n对每个中间位置 i（1 ≤ i ≤ n-2），看它前后的变化方向：如果 (a[i] - a[i-1]) 与 (a[i+1] - a[i]) 一个为正、一个为负，说明方向反过来了，i 就是折点。",
+   code:String.raw`#include <cstdio>
+int main(){
+    int n, a[1005];
+    scanf("%d", &n);
+    for(int i = 0; i < n; ++i) scanf("%d", &a[i]);
+    int cnt = 0;
+    for(int i = 1; i + 1 < n; ++i){
+        int d1 = a[i] - a[i-1], d2 = a[i+1] - a[i];
+        if((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) cnt++;
+    }
+    printf("%d\n", cnt);
+    return 0;
+}`},
+
+  {id:15,cat:"模拟",source:"CCF CSP 201609-1",title:"最大波动",limit:"1.0s / 256MB",
+   desc:"小明正在利用股票的波动程度来研究股票。他拿到了一只股票每天收盘时的价格，想知道这只股票连续几天的最大波动值是多少，即在这几天中，某天收盘价格与前一天收盘价格之差的绝对值最大是多少。\n例如 6 天价格 2 5 5 7 3 5 中，第四天到第五天的波动最大，波动值为 |3 - 7| = 4。",
+   input:"第一行包含一个整数 n（2 ≤ n ≤ 1000），表示收盘价格的连续天数。\n第二行包含 n 个正整数，依次表示每天的收盘价格（1 到 10000 之间的整数）。",
+   output:"输出一个整数，表示这只股票这 n 天中的最大波动值。",
+   samples:[{in:"6\n2 5 5 7 3 5",out:"4"}],
+   hint:"把相邻两天的价格差的绝对值都算出来，取其中最大的一个即可。\n求绝对值用 abs()（需要 #include <cstdlib>）。",
+   code:String.raw`#include <cstdio>
+#include <cstdlib>
+int main(){
+    int n, a[1005];
+    scanf("%d", &n);
+    for(int i = 0; i < n; ++i) scanf("%d", &a[i]);
+    int mx = 0;
+    for(int i = 1; i < n; ++i){
+        int d = abs(a[i] - a[i-1]);
+        if(d > mx) mx = d;
+    }
+    printf("%d\n", mx);
+    return 0;
+}`},
+
+  {id:16,cat:"模拟",source:"CCF CSP 201703-1",title:"分蛋糕",limit:"1.0s / 256MB",
+   desc:"小明今天生日，他有 n 块蛋糕要分给朋友们吃，这 n 块蛋糕（编号为 1 到 n）的重量分别为 a1, a2, ..., an。小明想分给每个朋友至少重量为 k 的蛋糕。朋友们已经排好队准备领蛋糕，对于每个朋友，小明总是先把自己手中编号最小的蛋糕分给他；当这个朋友所分得的重量不到 k 时，再继续把剩下的蛋糕中编号最小的给他，直到蛋糕分完，或者这个朋友分到的总重量大于等于 k。\n请问当小明的蛋糕分完时，总共有多少个朋友分到了蛋糕。",
+   input:"第一行包含两个整数 n 和 k（1 ≤ n ≤ 1000，1 ≤ k ≤ 10000）。\n第二行包含 n 个正整数，依次表示 a1, a2, ..., an（1 ≤ ai ≤ 1000）。",
+   output:"输出一个整数，表示有多少个朋友分到了蛋糕。",
+   samples:[{in:"6 9\n2 6 5 6 3 5",out:"3"}],
+   hint:"从头往后累加：sum 记录当前这位朋友已经拿到的总重量，一旦 sum ≥ k，说明这位朋友够了，人数 +1 并把 sum 清零，开始下一位。\n注意最后如果 sum > 0（最后一位朋友没拿够 k，但蛋糕已经分完），他同样算「分到了蛋糕」，人数也要 +1。",
+   code:String.raw`#include <cstdio>
+int main(){
+    int n, k, a[1005];
+    scanf("%d %d", &n, &k);
+    for(int i = 0; i < n; ++i) scanf("%d", &a[i]);
+    int cnt = 0, sum = 0;
+    for(int i = 0; i < n; ++i){
+        sum += a[i];
+        if(sum >= k){ cnt++; sum = 0; }
+    }
+    if(sum > 0) cnt++;   // 最后一位朋友没拿够，但蛋糕分完了，也算
+    printf("%d\n", cnt);
+    return 0;
+}`},
+
+  {id:17,cat:"模拟",source:"CCF CSP 201803-1",title:"跳一跳",limit:"1.0s / 256MB",
+   desc:"近来跳一跳这款小游戏十分流行。简化后的规则如下：玩家每次从当前方块跳到下一个方块，如果没有跳到方块上则游戏结束。\n如果跳到了方块上、但没有跳到方块中心，则得 1 分；如果跳到了方块中心，若上一次得分为 1 分、或者这是本局第一次跳跃，则此次得 2 分，否则此次得分比上一次得分多 2 分（即连续跳到中心时累计得分为 2、4、6、8……）。\n现在给出一次跳跃的全过程，请计算本局得分。",
+   input:"输入包含多个用空格分隔的数字，每个数字是 1、2、0 之一：1 表示跳到方块上但没到中心，2 表示跳到了方块中心，0 表示没有跳到方块上（游戏结束）。\n数据保证 0 恰好出现一次且是最后一个数字，数字个数不超过 30。",
+   output:"输出一个整数，为本局游戏的得分。",
+   samples:[{in:"1 1 2 2 2 1 1 2 2 0",out:"22"}],
+   hint:"用一个变量 last 记住上一次的得分（初始设为 1，这样第一次跳到中心也能得 2 分）。\n读到 1：总分 +1，并把 last 置回 1；\n读到 2：本次得分 = (last == 1 ? 2 : last + 2)，累加后把 last 更新为本次得分；\n读到 0：游戏结束。",
+   code:String.raw`#include <cstdio>
+int main(){
+    int x, score = 0, last = 1;
+    while(scanf("%d", &x) == 1 && x != 0){
+        if(x == 1){
+            score += 1;
+            last = 1;
+        }else{
+            last = (last == 1) ? 2 : last + 2;
+            score += last;
+        }
+    }
+    printf("%d\n", score);
+    return 0;
+}`},
+
+  {id:18,cat:"模拟",source:"CCF CSP 201809-1",title:"卖菜",limit:"1.0s / 256MB",
+   desc:"一条街上有 n 个卖菜的商店，按 1 到 n 的顺序排成一排。第一天每个商店都自己定了一个价格。第二天，每家商店都会把菜价设置为自己和相邻商店第一天菜价的平均值（用去尾法取整）。\n编号为 1 的商店只有相邻商店 2，编号为 n 的商店只有相邻商店 n-1，其余编号 i 的商店有两个相邻商店 i-1 和 i+1。\n给定第一天各商店的菜价，请计算第二天每个商店的菜价。",
+   input:"第一行包含一个整数 n（2 ≤ n ≤ 1000）。\n第二行包含 n 个整数，依次表示每个商店第一天的菜价（不超过 10000 的正整数）。",
+   output:"输出一行，包含 n 个正整数，依次表示每个商店第二天的菜价。",
+   samples:[{in:"8\n4 1 3 1 6 5 17 9",out:"2 2 1 3 4 9 10 13"}],
+   hint:"分三种情况：第 1 家和最后 1 家只有两个数求平均（除以 2），中间的家用自己和左右邻居共三个数求平均（除以 3）。\n直接用整数除法就是「去尾法取整」，不需要额外处理。",
+   code:String.raw`#include <cstdio>
+int main(){
+    int n, a[1005], b[1005];
+    scanf("%d", &n);
+    for(int i = 0; i < n; ++i) scanf("%d", &a[i]);
+    for(int i = 0; i < n; ++i){
+        if(i == 0)          b[i] = (a[0] + a[1]) / 2;
+        else if(i == n - 1) b[i] = (a[n-2] + a[n-1]) / 2;
+        else                b[i] = (a[i-1] + a[i] + a[i+1]) / 3;
+    }
+    for(int i = 0; i < n; ++i)
+        printf("%d%c", b[i], i + 1 == n ? '\n' : ' ');
+    return 0;
+}`},
+
+  {id:19,cat:"模拟",source:"CCF CSP 201812-1",title:"小明上学",limit:"1.0s / 256MB",
+   desc:"小明每天骑车往返于家和学校，他希望预计自己上学所需的时间。上学路上要经过数段道路，相邻两段道路之间至多有一盏红绿灯。\n红绿灯有红、黄、绿三盏灯和倒计时显示牌。设红灯 r 秒、黄灯 y 秒、绿灯 g 秒，则从 0 时刻起：[0, r) 内亮红灯，车辆不许通过；[r, r+g) 内亮绿灯，车辆允许通过；[r+g, r+g+y) 内亮黄灯，车辆不许通过，然后依次循环。显示牌上的数字 l（l > 0）表示距离下一次信号灯变化的秒数。\n一次上学路上，小明记录下了经过每段路的时间，以及到达每个路口时信号灯的颜色和倒计时秒数。请计算这次上学共用了多少时间。",
+   input:"第一行包含三个正整数 r、y、g（均不超过 10^6），表示红绿灯的设置。\n第二行包含一个正整数 n（n ≤ 100），表示经过的道路段数和看到的红绿灯数目。\n接下来 n 行，每行包含两个整数 k、t：k = 0 表示经过了一段道路，耗时 t 秒（t ≤ 10^6）；k = 1、2、3 分别表示看到红灯、黄灯、绿灯，倒计时显示的数字为 t。",
+   output:"输出一个整数，表示此次上学所用的时间。",
+   samples:[{in:"30 3 30\n8\n0 10\n1 5\n0 11\n2 2\n0 6\n0 3\n3 10\n0 3",out:"70"}],
+   hint:"一段一段地累加时间：\n· k = 0（道路）：直接加 t；\n· k = 1（红灯）：要等到红灯结束，加 t；\n· k = 2（黄灯）：黄灯期间不能走，之后还会变成红灯，所以要加 t + r；\n· k = 3（绿灯）：直接通过，加 0。\n总时间可能较大，用 long long 存。",
+   code:String.raw`#include <cstdio>
+int main(){
+    int r, y, g, n;
+    scanf("%d %d %d", &r, &y, &g);
+    scanf("%d", &n);
+    long long total = 0;
+    for(int i = 0; i < n; ++i){
+        int k, t;
+        scanf("%d %d", &k, &t);
+        if(k == 0)      total += t;         // 一段道路
+        else if(k == 1) total += t;         // 红灯，等它结束
+        else if(k == 2) total += t + r;     // 黄灯，之后还要等一个红灯
+        // k == 3：绿灯，直接通过，不花时间
+    }
+    printf("%lld\n", total);
+    return 0;
+}`},
+
+  {id:20,cat:"枚举",source:"CCF CSP 201712-1",title:"最小差值",limit:"1.0s / 256MB",
+   desc:"给定 n 个数，请找出其中相差（差的绝对值）最小的两个数，输出它们的差值的绝对值。\n例如 1 5 4 8 20 中，相差最小的是 5 和 4，差值为 1；再如 9 3 6 1 3 中有两个 3，差值为 0。",
+   input:"第一行包含一个整数 n（2 ≤ n ≤ 1000）。\n第二行包含 n 个正整数，相邻整数之间用一个空格分隔（每个数不超过 10000）。",
+   output:"输出一个整数，表示答案。",
+   samples:[{in:"5\n1 5 4 8 20",out:"1"},{in:"5\n9 3 6 1 3",out:"0"}],
+   hint:"先把 n 个数从小到大排序，那么最小差值一定出现在排序后相邻的两个数之间，只需要扫一遍相邻差、取最小值。\n排序用 std::sort（需要 #include <algorithm>）。",
+   code:String.raw`#include <cstdio>
+#include <algorithm>
+int main(){
+    int n, a[1005];
+    scanf("%d", &n);
+    for(int i = 0; i < n; ++i) scanf("%d", &a[i]);
+    std::sort(a, a + n);
+    int mn = a[1] - a[0];
+    for(int i = 2; i < n; ++i)
+        if(a[i] - a[i-1] < mn) mn = a[i] - a[i-1];
+    printf("%d\n", mn);
+    return 0;
+}`},
+
+  {id:21,cat:"枚举",source:"CCF CSP 202009-1",title:"称检测点查询",limit:"1.0s / 256MB",
+   desc:"某市设有 n 个核酸检测点，编号从 1 到 n，其中 i 号检测点的位置是平面上的整数坐标 (xi, yi)。为方便预约，请根据市民所在位置 (X, Y)，查询距其最近的三个检测点。\n如果有多个检测点距离相同，编号较小的视为更近。",
+   input:"输入共 n + 1 行。\n第一行包含三个整数 n、X、Y（3 ≤ n ≤ 200），表示检测点总数和市民所在位置。\n接下来 n 行，第 i + 1 行包含两个整数 xi、yi，表示 i 号检测点的坐标（所有坐标的绝对值不超过 1000）。",
+   output:"输出共三行，按距离从近到远，依次输出距离该市民最近的三个检测点编号。",
+   samples:[{in:"3 2 2\n2 2\n2 3\n2 4",out:"1\n2\n3"},{in:"5 0 1\n-1 0\n0 0\n1 0\n0 2\n-1 2",out:"2\n4\n1"}],
+   hint:"比较远近不必真的开根号，比「距离的平方」就够了，还能避免浮点误差：dx = xi - X，dy = yi - Y，d = dx*dx + dy*dy。\n把所有点按 (d 从小到大, 编号从小到大) 排序，输出前三个编号即可。",
+   code:String.raw`#include <cstdio>
+#include <algorithm>
+struct P { int id; long long d; };
+bool cmp(const P &a, const P &b){
+    if(a.d != b.d) return a.d < b.d;
+    return a.id < b.id;      // 距离相同时，编号小的更近
+}
+int main(){
+    int n, X, Y;
+    scanf("%d %d %d", &n, &X, &Y);
+    P p[205];
+    for(int i = 0; i < n; ++i){
+        int x, y;
+        scanf("%d %d", &x, &y);
+        p[i].id = i + 1;
+        long long dx = x - X, dy = y - Y;
+        p[i].d = dx * dx + dy * dy;
+    }
+    std::sort(p, p + n, cmp);
+    for(int i = 0; i < 3; ++i) printf("%d\n", p[i].id);
+    return 0;
+}`},
+
+  {id:22,cat:"枚举",source:"CCF CSP 201912-2",title:"回收站选址",limit:"1.0s / 512MB",
+   desc:"校园里堆积了不少垃圾，同学们准备在垃圾集中的地方建回收站。已知 n 处垃圾的坐标 (xi, yi)，均为整数且互不相同。\n一个位置 (x, y) 适合建回收站，需要满足：\n· 该处本身有垃圾；\n· 上下左右四个邻居 (x, y+1)、(x, y-1)、(x+1, y)、(x-1, y) 处都有垃圾。\n满足上述条件后给它评分：分数为 (x±1, y±1) 四个对角位置中有几处有垃圾，取值 0 到 4。\n请统计每种得分的选址各有多少个。",
+   input:"输入共有 n + 1 行。\n第 1 行包含一个正整数 n（1 ≤ n ≤ 1000），表示已查明的垃圾点个数。\n第 1 + i 行（1 ≤ i ≤ n）包含两个由空格分隔的整数 xi、yi，表示第 i 处垃圾的坐标（|xi|, |yi| ≤ 10^9，坐标可以是负数）。\n保证输入的 n 个坐标互不相同。",
+   output:"输出共五行，每行一个整数，依次表示得分为 0、1、2、3、4 的回收站选址个数。",
+   samples:[{in:"7\n1 2\n2 1\n0 0\n1 1\n1 0\n2 0\n0 1",out:"0\n0\n1\n0\n0"},{in:"2\n0 0\n-100000 10",out:"0\n0\n0\n0\n0"},{in:"11\n9 10\n10 10\n11 10\n12 10\n13 10\n11 9\n11 8\n12 9\n10 9\n10 11\n12 11",out:"0\n2\n1\n0\n0"}],
+   hint:"先把所有垃圾坐标放进一个 set（集合），这样就能快速判断「某个坐标上有没有垃圾」。\n然后枚举每一处垃圾作为候选点：先检查上下左右四个邻居是否都在集合里；若都在，再数四个对角有几个在集合里，得到得分 score，最后 ans[score]++。\n坐标最大到 10^9，所以只能按点存储，不能开二维数组（那样会爆）。",
+   code:String.raw`#include <cstdio>
+#include <set>
+int main(){
+    int n;
+    scanf("%d", &n);
+    int x[1005], y[1005];
+    std::set<std::pair<int,int> > s;
+    for(int i = 0; i < n; ++i){
+        scanf("%d %d", &x[i], &y[i]);
+        s.insert(std::make_pair(x[i], y[i]));
+    }
+    int ans[5] = {0, 0, 0, 0, 0};
+    for(int i = 0; i < n; ++i){
+        int cx = x[i], cy = y[i];
+        // 上下左右必须都有垃圾
+        if(s.count(std::make_pair(cx, cy+1)) && s.count(std::make_pair(cx, cy-1)) &&
+           s.count(std::make_pair(cx+1, cy)) && s.count(std::make_pair(cx-1, cy))){
+            int sc = 0;
+            if(s.count(std::make_pair(cx+1, cy+1))) sc++;
+            if(s.count(std::make_pair(cx+1, cy-1))) sc++;
+            if(s.count(std::make_pair(cx-1, cy+1))) sc++;
+            if(s.count(std::make_pair(cx-1, cy-1))) sc++;
+            ans[sc]++;
+        }
+    }
+    for(int i = 0; i < 5; ++i) printf("%d\n", ans[i]);
+    return 0;
 }`}
 ];
 
 var CATS = ["全部","模拟","基础语法","字符串","枚举","贪心","二分","动态规划","图论"];
+
+/* =========================================================
+   1b. 基础选择题题库（自编，用于打基础，非 CCF 官方题）
+   ========================================================= */
+var CHOICE_CATS = ["全部","C++基础","计算机基础","CSP常识"];
+
+var CHOICE = [
+  /* ---------- C++ 基础 ---------- */
+  {id:"c1",cat:"C++基础",q:"C++ 中 int 类型通常占几个字节？",opts:["1","2","4","8"],ans:2,
+   exp:"在绝大多数平台上 int 占 4 个字节（32 位），能表示大约 -21 亿到 21 亿之间的整数。"},
+  {id:"c2",cat:"C++基础",q:"下面哪个是合法的 C++ 变量名？",opts:["2num","int","_sum","my-var"],ans:2,
+   exp:"变量名不能以数字开头（2num 错）、不能是关键字（int 错）、不能含减号（my-var 错）。用下划线开头是允许的。"},
+  {id:"c3",cat:"C++基础",q:"在 C++ 中，表达式 7 / 2 的结果是？",opts:["3.5","3","4","3.0"],ans:1,
+   exp:"两个整数相除做的是整除，小数部分被直接丢掉，所以 7 / 2 = 3。想得到 3.5 要写成 7.0 / 2。"},
+  {id:"c4",cat:"C++基础",q:"表达式 7 % 3 的值是？",opts:["0","1","2","2.33"],ans:1,
+   exp:"% 是取余（求余数）：7 除以 3 商 2 余 1，所以结果是 1。判断偶数常用 i % 2 == 0。"},
+  {id:"c5",cat:"C++基础",q:"已知 int a = 5; 执行 a++; 之后 a 的值是？",opts:["4","5","6","7"],ans:2,
+   exp:"a++ 表示把 a 加 1，等价于 a = a + 1，所以 5 变成 6。"},
+  {id:"c6",cat:"C++基础",q:"C++ 中用标准流做输出，正确的写法是？",opts:["printf(...)","cout << ...","cin >> ...","scanf(...)"],ans:1,
+   exp:"cout 配合 << 是 C++ 的流式输出；cin >> 是输入；printf / scanf 是 C 风格的函数。"},
+  {id:"c7",cat:"C++基础",q:"要使用 printf、scanf，需要包含哪个头文件？",opts:["<iostream>","<cstdio>","<string>","<cmath>"],ans:1,
+   exp:"printf / scanf 在 <cstdio>（即 C 语言的 stdio.h）里；<iostream> 是给 cin / cout 用的。"},
+  {id:"c8",cat:"C++基础",q:"定义 int a[5]; 之后，合法的下标范围是？",opts:["1 ~ 5","0 ~ 4","0 ~ 5","1 ~ 4"],ans:1,
+   exp:"C++ 数组下标从 0 开始，长度 5 的数组下标是 0、1、2、3、4。越界访问不会立刻报错，但结果不可预期。"},
+  {id:"c9",cat:"C++基础",q:"循环 for(int i = 0; i < n; i++)（n 为正整数）一共执行多少次循环体？",opts:["n - 1 次","n 次","n + 1 次","无限次"],ans:1,
+   exp:"i 依次取 0, 1, ..., n-1，一共 n 个值，所以循环体执行 n 次。"},
+  {id:"c10",cat:"C++基础",q:"函数的返回类型写成 void，表示？",opts:["返回整数 0","返回任意类型","不返回任何值","返回空字符串"],ans:2,
+   exp:"void 表示该函数没有返回值，调用它时不能用变量去接收结果。"},
+  {id:"c11",cat:"C++基础",q:"C 风格字符串 \"abc\" 存储时，末尾额外隐含的一个字符是？",opts:["换行符 \\n","空格","结束符 \\0","制表符 \\t"],ans:2,
+   exp:"C 风格字符串以 '\\0'（空字符，值为 0）结尾，用来标记字符串到哪里结束。"},
+
+  /* ---------- 计算机基础 ---------- */
+  {id:"c12",cat:"计算机基础",q:"1 个字节（byte）等于多少个二进制位（bit）？",opts:["4","8","16","1024"],ans:1,
+   exp:"1 byte = 8 bit，这是计算机里最基础的单位换算。"},
+  {id:"c13",cat:"计算机基础",q:"二进制数 1010 对应的十进制数是？",opts:["8","10","12","20"],ans:1,
+   exp:"按位权展开：1×8 + 0×4 + 1×2 + 0×1 = 8 + 2 = 10。"},
+  {id:"c14",cat:"计算机基础",q:"十六进制数 1F 对应的十进制数是？",opts:["15","16","31","32"],ans:2,
+   exp:"1×16 + F×1，其中字母 F 代表 15，所以是 16 + 15 = 31。"},
+  {id:"c15",cat:"计算机基础",q:"八进制数 17 对应的十进制数是？",opts:["7","15","17","23"],ans:1,
+   exp:"1×8 + 7×1 = 8 + 7 = 15。"},
+  {id:"c16",cat:"计算机基础",q:"ASCII 码中大写字母 'A' 的十进制值是？",opts:["63","65","97","100"],ans:1,
+   exp:"'A' 是 65，'a' 是 97，两者相差 32，这是很常用的常识。"},
+  {id:"c17",cat:"计算机基础",q:"大写字母 'A' 和小写字母 'a' 的 ASCII 值相差多少？",opts:["26","32","48","64"],ans:1,
+   exp:"65 与 97 相差 32。想让大写变小写，加上 32 即可。"},
+  {id:"c18",cat:"计算机基础",q:"1 KB 等于多少字节？",opts:["100","1000","1024","1024×1024"],ans:2,
+   exp:"计算机中 1 KB = 1024 B（2 的 10 次方）；1 MB = 1024 KB，1 GB = 1024 MB。"},
+  {id:"c19",cat:"计算机基础",q:"计算机能够直接执行的语言是？",opts:["高级语言","汇编语言","机器语言","C++"],ans:2,
+   exp:"CPU 只能直接执行由 0 和 1 组成的机器语言，高级语言和汇编都要先转换成机器语言。"},
+  {id:"c20",cat:"计算机基础",q:"把 C++ 源代码翻译成机器码（可执行程序）的过程叫做？",opts:["解释","编译","编码","加密"],ans:1,
+   exp:"编译器（如 g++）把源代码整体翻译成可执行文件，这个过程叫编译。"},
+  {id:"c21",cat:"计算机基础",q:"8 位有符号整数按补码表示，能表示的范围是？",opts:["-127 ~ 127","-128 ~ 127","0 ~ 255","-128 ~ 128"],ans:1,
+   exp:"8 位补码范围是 -128 到 127；若无符号则是 0 到 255。所以 int 加过头会溢出成负数。"},
+  {id:"c22",cat:"计算机基础",q:"无符号整数 unsigned int 能表示的最小值是？",opts:["-1","0","1","取决于编译器"],ans:1,
+   exp:"无符号表示不带负号，最小值就是 0，最大值比同宽度的有符号数大一倍左右。"},
+
+  /* ---------- CSP 考试常识 ---------- */
+  {id:"c23",cat:"CSP常识",q:"CCF CSP 认证考试的总时长是多少？",opts:["2 小时","3 小时","4 小时","5 小时"],ans:2,
+   exp:"CSP 认证考试时长 4 小时，要在这段时间内完成 5 道编程题。"},
+  {id:"c24",cat:"CSP常识",q:"CSP 认证一场考试一共几道题？",opts:["3 道","4 道","5 道","6 道"],ans:2,
+   exp:"每场考试共 5 道编程题。"},
+  {id:"c25",cat:"CSP常识",q:"CSP 的计分方式是？",opts:["每题 100 分，满分 500 分","每题 50 分，满分 250 分","每题 100 分，满分 1000 分","每题 20 分，满分 100 分"],ans:0,
+   exp:"每题 100 分，5 题合计满分 500 分。"},
+  {id:"c26",cat:"CSP常识",q:"CSP 成绩的有效期是？",opts:["1 年","2 年","3 年","终身有效"],ans:2,
+   exp:"CSP 成绩三年内有效，并且取这三年内的最高成绩。"},
+  {id:"c27",cat:"CSP常识",q:"CSP 采用哪种测评方式？",opts:["人工阅卷","自动评测（用测试数据运行程序比对输出）","现场答辩","抽签"],ans:1,
+   exp:"系统先把程序编译，再用多组测试数据自动运行并比对输出，按通过的数据点给分。"},
+  {id:"c28",cat:"CSP常识",q:"关于 CSP 成绩的认定，下面说法正确的是？",opts:["取所有场次的平均分","取三年内各场中的最高分","只认最后一次的成绩","取最低分"],ans:1,
+   exp:"成绩三年有效，取这期间的最高分，所以完全可以通过多考几次来刷分。"},
+  {id:"c29",cat:"CSP常识",q:"程序运行超过了题目规定的时间限制，评测结果通常是？",opts:["答案错误（WA）","运行超时（TLE）","编译错误（CE）","格式错误"],ans:1,
+   exp:"TLE = Time Limit Exceeded，即运行超时。WA 是答案错误，CE 是编译错误，MLE 是内存超限。"},
+  {id:"c30",cat:"CSP常识",q:"提交的程序无法通过编译，评测结果通常是？",opts:["编译错误（CE）","运行错误（RE）","答案错误（WA）","运行超时（TLE）"],ans:0,
+   exp:"编译不通过会得到 CE（Compile Error）。本地先用 g++ 编译一遍，能避免这类低级失误。"},
+  {id:"c31",cat:"CSP常识",q:"CSP 题目中的输入数据一般从哪里读入？",opts:["从键盘手动输入","从标准输入（stdin）读入","从文件 input.txt 读入","从网络下载"],ans:1,
+   exp:"题目使用标准输入输出，即用 cin / scanf 读、cout / printf 写，不需要自己打开文件。"},
+  {id:"c32",cat:"CSP常识",q:"做 CSP 题时，下面哪种做法是正确的？",opts:["样例过了就一定满分","只需考虑题目给的最小数据范围","按题目给出的数据规模设计算法，并注意时间和内存限制","同一年只能参加一次"],ans:2,
+   exp:"CSP 按数据规模分层给分，必须针对最大规模设计算法，否则大数据点会超时或超内存。"}
+];
 
 var MAJORS = {
   electronic:{name:"电子类",plus:30},
@@ -821,6 +1180,7 @@ function flushSession(){
 var TITLES = {
   home:["备考总览","CCF CSP 计算机软件能力认证"],
   practice:["真题练习","看真题题面，自评掌握情况"],
+  choice:["基础选择题","自动判分，巩固基本功"],
   wrong:["错题本","反复练，直到不再错"],
   stats:["学习统计","用数据看进步"],
   me:["我的","考试设置与数据管理"]
@@ -829,8 +1189,8 @@ var TITLES = {
 var currentView = "home";
 
 function go(v){
-  // 离开刷题页时先把这一段学习时间结算掉
-  if(currentView === "practice" && v !== "practice") flushSession();
+  // 离开做题页时先把这一段学习时间结算掉（真题页和选择题页共用一个计时器）
+  if((currentView === "practice" || currentView === "choice") && v !== currentView) flushSession();
 
   document.querySelectorAll(".page").forEach(function(p){ p.classList.remove("active"); });
   document.getElementById("page-" + v).classList.add("active");
@@ -843,6 +1203,7 @@ function go(v){
   currentView = v;
 
   if(v === "practice"){ practice.sessionStart = Date.now(); renderPractice(); }
+  if(v === "choice"){ practice.sessionStart = Date.now(); renderChoice(); }
   if(v === "home") renderHome();
   if(v === "wrong") renderWrong();
   if(v === "stats") renderStats();
@@ -927,10 +1288,16 @@ function renderHome(){
   }
 }
 
+/* 同时支持真题（数字 id）和选择题（字符串 id），统一按字符串比较 */
 function byId(id){
-  for(var i=0;i<BANK.length;i++) if(BANK[i].id === id) return BANK[i];
+  var s = String(id), i;
+  for(i = 0; i < BANK.length; i++) if(String(BANK[i].id) === s) return BANK[i];
+  for(i = 0; i < CHOICE.length; i++) if(String(CHOICE[i].id) === s) return CHOICE[i];
   return null;
 }
+
+/* 有 opts 字段的是选择题，否则是编程真题 */
+function isChoice(q){ return q && q.opts !== undefined; }
 
 /* =========================================================
    5. 刷题模块
@@ -1110,6 +1477,152 @@ function nextQuestion(){
 }
 
 /* =========================================================
+   5b. 基础选择题模块（自动判分）
+   ========================================================= */
+var choice = {
+  cat:"全部",
+  list:[],
+  idx:0,
+  chosen:-1,     // 本题选中的选项下标
+  revealed:false,
+  right:0        // 本组答对数
+};
+
+function buildChoiceList(cat){
+  var pool = CHOICE.filter(function(q){ return cat === "全部" || q.cat === cat; });
+  for(var i = pool.length - 1; i > 0; i--){
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  return pool;
+}
+
+function renderChoice(){
+  var chips = document.getElementById("choiceChips");
+  chips.innerHTML = CHOICE_CATS.map(function(c){
+    return '<button class="chip' + (c === choice.cat ? " active" : "") +
+           '" data-ccat="' + c + '">' + c + '</button>';
+  }).join("");
+
+  if(!choice.list.length){
+    choice.list = buildChoiceList(choice.cat);
+    choice.idx = 0; choice.chosen = -1; choice.revealed = false; choice.right = 0;
+  }
+
+  var box = document.getElementById("choiceBody");
+
+  if(choice.idx >= choice.list.length){
+    var answered = choice.list.length;
+    box.innerHTML =
+      '<div class="card">' +
+        '<h2 class="card-title">本组完成</h2>' +
+        '<div class="kpi-row">' +
+          '<div class="kpi"><div class="k-label">本组题数</div><div class="k-value">' + answered + '<small>题</small></div></div>' +
+          '<div class="kpi"><div class="k-label">答对</div><div class="k-value">' + choice.right + '<small>题</small></div></div>' +
+        '</div>' +
+        '<div class="about" style="margin-top:14px;">' +
+          '答错的题已自动收进错题本，去复盘一下。' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn" id="btnCAgain">再来一组</button>' +
+      '<button class="btn ghost" onclick="go(\'wrong\')">看错题本</button>';
+    document.getElementById("btnCAgain").onclick = function(){
+      choice.list = buildChoiceList(choice.cat);
+      choice.idx = 0; choice.chosen = -1; choice.revealed = false; choice.right = 0;
+      renderChoice();
+    };
+    return;
+  }
+
+  var q = choice.list[choice.idx];
+  var letters = ["A", "B", "C", "D"];
+  var optsHtml = q.opts.map(function(txt, i){
+    var cls = "opt";
+    if(choice.revealed){
+      if(i === q.ans) cls += " correct";
+      else if(i === choice.chosen) cls += " wrong";
+    }
+    return '<button class="' + cls + '" data-opt="' + i + '">' +
+             '<span class="idx">' + letters[i] + '</span><span>' + esc(txt) + '</span>' +
+           '</button>';
+  }).join("");
+
+  box.innerHTML =
+    '<div class="card">' +
+      '<div class="q-head">' +
+        '<span class="q-tag">' + q.cat + '</span>' +
+        '<span>第 ' + (choice.idx + 1) + ' / ' + choice.list.length + ' 题</span>' +
+      '</div>' +
+      '<div class="q-text">' + esc(q.q) + '</div>' +
+      '<div class="opts">' + optsHtml + '</div>' +
+      (choice.revealed ? choiceAnswerHtml(q) : "") +
+    '</div>' +
+    (choice.revealed
+      ? '<button class="btn" id="btnCNext">' + (choice.idx + 1 >= choice.list.length ? "查看本组结果" : "下一题") + '</button>'
+      : '<div class="about" style="text-align:center;margin-top:12px;">选一个你认为正确的答案</div>');
+
+  var ob = box.querySelector(".opts");
+  if(ob) ob.onclick = function(e){
+    var b = e.target.closest(".opt");
+    if(b && !choice.revealed) chooseOpt(parseInt(b.dataset.opt, 10));
+  };
+  var nb = document.getElementById("btnCNext");
+  if(nb) nb.onclick = nextChoice;
+}
+
+function choiceAnswerHtml(q){
+  var ok = choice.chosen === q.ans;
+  return '<div class="answer-box">' +
+           '<div class="a-title ' + (ok ? "ok" : "bad") + '">' +
+             (ok ? "✅ 答对了" : "❌ 答错了，正确答案是 " + "ABCD"[q.ans]) +
+           '</div>' +
+           '<div class="a-exp">' + esc(q.exp) + '</div>' +
+         '</div>';
+}
+
+function chooseOpt(i){
+  if(choice.revealed) return;
+  var q = choice.list[choice.idx];
+  choice.chosen = i;
+  choice.revealed = true;
+  if(i === q.ans) choice.right++;
+
+  // 学习时长结算（单段上限 15 分钟，防挂机）
+  var rec = dayRecord(today());
+  rec.answered++;
+  if(i === q.ans) rec.correct++;
+  if(practice.sessionStart){
+    var sec = Math.round((Date.now() - practice.sessionStart) / 1000);
+    if(sec > 0 && sec <= 900) rec.seconds += sec;
+  }
+  practice.sessionStart = Date.now();
+
+  // 记录做过 / 逐题掌握统计
+  if(DB.done.indexOf(q.id) === -1) DB.done.push(q.id);
+  if(!DB.qstat[q.id]) DB.qstat[q.id] = {a:0, c:0};
+  DB.qstat[q.id].a++;
+  if(i === q.ans){
+    DB.qstat[q.id].c++;
+    if(DB.solved.indexOf(q.id) === -1) DB.solved.push(q.id);
+    DB.wrong = DB.wrong.filter(function(x){ return String(x) !== String(q.id); });
+  }else{
+    if(DB.wrong.indexOf(q.id) === -1) DB.wrong.push(q.id);
+  }
+
+  saveDB();
+  renderChoice();
+}
+
+function nextChoice(){
+  flushSession();
+  practice.sessionStart = Date.now();
+  choice.idx++;
+  choice.chosen = -1;
+  choice.revealed = false;
+  renderChoice();
+}
+
+/* =========================================================
    6. 错题本
    ========================================================= */
 function renderWrong(){
@@ -1125,10 +1638,13 @@ function renderWrong(){
   body.innerHTML = list.map(function(id){
     var q = byId(id);
     if(!q) return "";
+    var ch = isChoice(q);
+    var meta = ch ? "选择题 · 答错" : q.source;
+    var text = ch ? (q.q.length > 46 ? q.q.slice(0,46) + "…" : q.q) : q.title;
     return '<div class="wrong-item">' +
              '<div class="w-top"><span class="q-tag">' + q.cat + '</span>' +
-             '<span style="font-size:12px;color:var(--muted)">' + q.source + '</span></div>' +
-             '<div class="w-q">' + esc(q.title) + '</div>' +
+             '<span style="font-size:12px;color:var(--muted)">' + meta + '</span></div>' +
+             '<div class="w-q">' + esc(text) + '</div>' +
              '<div class="w-act">' +
                '<button class="w-redo" data-redo="' + id + '">重做这道</button>' +
                '<button data-master="' + id + '">已掌握</button>' +
@@ -1140,18 +1656,26 @@ function renderWrong(){
     var rd = e.target.closest("[data-redo]");
     var ms = e.target.closest("[data-master]");
     if(rd){
-      var id = parseInt(rd.dataset.redo, 10);
-      var q = byId(id);
-      practice.cat = "全部";
-      practice.list = [q];
-      practice.idx = 0; practice.level = ""; practice.catTally = {};
-      go("practice");
+      var q = byId(rd.dataset.redo);
+      if(!q) return;
+      if(isChoice(q)){
+        choice.cat = "全部";
+        choice.list = [q];
+        choice.idx = 0; choice.chosen = -1; choice.revealed = false; choice.right = 0;
+        go("choice");
+      }else{
+        practice.cat = "全部";
+        practice.list = [q];
+        practice.idx = 0; practice.level = ""; practice.catTally = {};
+        go("practice");
+      }
       toast("开始重做：" + q.cat);
     }
     if(ms){
-      var mid = parseInt(ms.dataset.master, 10);
-      DB.wrong = DB.wrong.filter(function(x){ return x !== mid; });
-      if(DB.mastered.indexOf(mid) === -1) DB.mastered.push(mid);
+      var mq = byId(ms.dataset.master);
+      if(!mq) return;
+      DB.wrong = DB.wrong.filter(function(x){ return String(x) !== String(mq.id); });
+      if(DB.mastered.indexOf(mq.id) === -1) DB.mastered.push(mq.id);
       saveDB();
       renderWrong();
       toast("已移出错题本");
@@ -1162,6 +1686,26 @@ function renderWrong(){
 /* =========================================================
    7. 统计
    ========================================================= */
+/* 按考点生成掌握率进度条（真题、选择题共用） */
+function progressHtml(src, cats){
+  return cats.map(function(c){
+    var total = 0, doneN = 0, attempts = 0, rightN = 0;
+    src.forEach(function(q){
+      if(q.cat !== c) return;
+      total++;
+      if(DB.done.indexOf(q.id) !== -1) doneN++;
+      var st = DB.qstat[q.id];
+      if(st){ attempts += st.a; rightN += st.c; }
+    });
+    var acc = attempts ? Math.round(rightN / attempts * 100) : 0;
+    return '<div class="progress-row">' +
+             '<div class="p-top"><span>' + c + '</span>' +
+             '<span class="p-val">' + doneN + '/' + total + ' 题 · 掌握率 ' + (attempts ? acc + "%" : "--") + '</span></div>' +
+             '<div class="progress-track"><div class="progress-fill" style="width:' + acc + '%"></div></div>' +
+           '</div>';
+  }).join("");
+}
+
 function renderStats(){
   // 近 7 天
   var days = [];
@@ -1186,40 +1730,19 @@ function renderStats(){
   }).join("");
 
   // 各考点掌握度
-  var cp = document.getElementById("catProgress");
-  var arr = [];
-  CATS.slice(1).forEach(function(c){
-    var total = 0, doneN = 0, attempts = 0, rightN = 0;
-    BANK.forEach(function(q){
-      if(q.cat !== c) return;
-      total++;
-      if(DB.done.indexOf(q.id) !== -1) doneN++;
-      var st = DB.qstat[q.id];
-      if(st){ attempts += st.a; rightN += st.c; }
-    });
-    arr.push({
-      cat:c, done:doneN, total:total, has:attempts > 0,
-      acc: attempts ? Math.round(rightN / attempts * 100) : 0
-    });
-  });
-
-  cp.innerHTML = arr.map(function(a){
-    return '<div class="progress-row">' +
-             '<div class="p-top"><span>' + a.cat + '</span>' +
-             '<span class="p-val">' + a.done + '/' + a.total + ' 题 · 掌握率 ' + (a.has ? a.acc + "%" : "--") + '</span></div>' +
-             '<div class="progress-track"><div class="progress-fill" style="width:' + a.acc + '%"></div></div>' +
-           '</div>';
-  }).join("");
+  document.getElementById("catProgress").innerHTML = progressHtml(BANK, CATS.slice(1));
+  document.getElementById("choiceProgress").innerHTML = progressHtml(CHOICE, CHOICE_CATS.slice(1));
 
   // 累计
   var ta = totalAnswered(), tc = totalCorrect(), tsec = totalSeconds();
   var acc = ta ? Math.round(tc / ta * 100) : 0;
   document.getElementById("totalStats").innerHTML =
-    '<div class="goal-line"><span class="g-name">累计自评</span><span class="g-val">' + ta + ' 题</span></div>' +
+    '<div class="goal-line"><span class="g-name">累计做题</span><span class="g-val">' + ta + ' 题</span></div>' +
     '<div class="goal-line"><span class="g-name">累计掌握率</span><span class="g-val">' + (ta ? acc + "%" : "--") + '</span></div>' +
     '<div class="goal-line"><span class="g-name">累计学习时长</span><span class="g-val">' + Math.floor(tsec/60) + ' 分钟</span></div>' +
-    '<div class="goal-line"><span class="g-name">真题总数</span><span class="g-val">' + BANK.length + ' 题</span></div>' +
-    '<div class="goal-line"><span class="g-name">已自评过的题</span><span class="g-val">' + DB.done.length + ' 题</span></div>' +
+    '<div class="goal-line"><span class="g-name">编程真题</span><span class="g-val">' + BANK.length + ' 题</span></div>' +
+    '<div class="goal-line"><span class="g-name">基础选择题</span><span class="g-val">' + CHOICE.length + ' 题</span></div>' +
+    '<div class="goal-line"><span class="g-name">已做过的题</span><span class="g-val">' + DB.done.length + ' 题</span></div>' +
     '<div class="goal-line"><span class="g-name">错题本</span><span class="g-val">' + DB.wrong.length + ' 题</span></div>' +
     '<div class="goal-line"><span class="g-name">已攻克（标记掌握）</span><span class="g-val">' + DB.mastered.length + ' 题</span></div>';
 }
@@ -1259,6 +1782,16 @@ function init(){
     practice.list = buildList(practice.cat);
     practice.idx = 0; practice.level = ""; practice.catTally = {};
     renderPractice();
+  };
+
+  // 选择题考点切换
+  document.getElementById("choiceChips").onclick = function(e){
+    var c = e.target.closest(".chip");
+    if(!c) return;
+    choice.cat = c.dataset.ccat;
+    choice.list = buildChoiceList(choice.cat);
+    choice.idx = 0; choice.chosen = -1; choice.revealed = false; choice.right = 0;
+    renderChoice();
   };
 
   // 设置项
@@ -1317,6 +1850,7 @@ function init(){
     DB = blankDB();
     saveDB();
     practice.list = []; practice.idx = 0;
+    choice.list = []; choice.idx = 0; choice.chosen = -1; choice.revealed = false; choice.right = 0;
     renderMe(); renderHome();
     toast("已清空");
   };
@@ -1325,7 +1859,7 @@ function init(){
   document.addEventListener("visibilitychange", function(){
     if(document.hidden){
       flushSession();
-    }else if(currentView === "practice" && !practice.sessionStart){
+    }else if((currentView === "practice" || currentView === "choice") && !practice.sessionStart){
       practice.sessionStart = Date.now();
     }
   });
